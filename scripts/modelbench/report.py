@@ -19,6 +19,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import json
+import re
 
 parser = argparse.ArgumentParser(description="Generate report from two specified inductor logs")
 parser.add_argument('-t','--target',type=str,help='target log file')
@@ -313,6 +314,7 @@ def parse_acc_failure(file,failed_model):
                     found =  True
                 if found ==  True and ("Error: " in line or "[ERROR]" in line or "TIMEOUT" in line or "FAIL" in line or "fail" in line):
                     line=line.replace(',',' ',20)
+                    line = re.sub(r'[\x00-\x1F\x7F-\x9F\uFFFE\uFFFF]', '', line)
                     result.append(model+", "+ line)
                     break
     return result
@@ -335,6 +337,7 @@ def parse_failure(file,failed_model):
                 elif found ==  True and line.find("Error: ")!=-1 or line.find("TIMEOUT")!=-1:
                     if line.find("Error: ")!=-1:
                         line=line.replace(',',' ',20)
+                    line = re.sub(r'[\x00-\x1F\x7F-\x9F\uFFFE\uFFFF]', '', line)
                     result.append(model+", "+ line)
                     break
     return result
@@ -1037,3 +1040,4 @@ if __name__ == '__main__':
     excel_postprocess(excel, 'Summary New')
     html_generate(args.html_off)     
     update_issue_commits(args.precision)
+
